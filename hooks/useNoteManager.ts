@@ -1,11 +1,15 @@
+import { createClient } from "@/lib/supabase/client";
+import { create } from "domain";
+import { waitForDebugger } from "inspector";
+import { AwardIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type Note = {
     id: string
     title: string
     content: string
-    createdAt: string
-    updatedAt: string
+    created_at: string
+    updated_at: string
 }
 
 export function useNoteManager(noteId?: string) {
@@ -19,6 +23,7 @@ export function useNoteManager(noteId?: string) {
     const [error, setError] = useState<string | null>(null)
 
     // Supabase client
+    const supabase = createClient()
 
     // Single note operations
     // Fetch single note
@@ -28,10 +33,16 @@ export function useNoteManager(noteId?: string) {
         const fetchNote = async () => {
             // supabase fetch
             try {
-                
+                const { data: note, error } = await supabase
+                    .from('notes')
+                    .select('*')
+                    .eq("note_id", noteId)
+                    .single();
+
+                if (error) throw error;
                 setNote(note)
             } catch (error: any) {
-                console.error("Error fetching note:", error)
+                console.error(`Error fetching note ID ${noteId}:`, error)
                 setError(error.message)
             } finally {
                 setIsLoading(false)
@@ -41,20 +52,43 @@ export function useNoteManager(noteId?: string) {
         fetchNote();
     }, [noteId])
 
-    const updateNote = () => {}
-    const saveNote = () => {}
+    const updateNote = (updates: Partial<Note>) => {
+        setNote((prev) => prev ? {...prev, ...updates} : null);
+    };
+    const saveNote = async (noteToSave?: Note) => {
+        try {
+            const noteData = noteToSave || note;
+            if (!noteData) throw new Error("No note data to save");
+
+            const { error } = await supabase
+                .from('notes')
+                .update({
+                    ...noteData,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('note_id', noteData.id)
+        } catch (error: any) {
+            console.error("Error saving note:", error);
+            setError(error.message);
+        }
+    };
     
     // List of notes operations
     // Fetch all notes
     useEffect(() => {
         if (noteId) return;  // Don't fetch if managing a single note
-        
+        fetchNotes()
     })
 
     const fetchNotes = async () => {
         try {
-            
-            setNotes(notes)
+            const { data: notes, error } = await supabase
+                .from('notes')
+                .select('*')
+                .order("created_at", { ascending: false });
+
+            if (error) throw error;
+            setNotes(notes || [])
         } catch (error: any) {
             console.error("Error fetching notes:", error)
             setError(error.message)
@@ -68,5 +102,18 @@ export function useNoteManager(noteId?: string) {
     const refreshNotes = async () => {
         setIsLoading(true)
         await fetchNotes();
+    }
+    return {
+        // States
+        note,
+        notes,
+        isLoading,
+        error,
+
+        // Single note operations
+        updateNote,
+        saveNote,
+
+        // List of notes operations
     }
 }
