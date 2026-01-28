@@ -98,7 +98,21 @@ export function useNoteManager(noteId?: string) {
     }
 
     const createNote = () => {}
-    const deleteNote = () => {}
+    
+    const deleteNote = async (noteId: string) => {
+        try {
+            const { error } = await supabase
+                .from('notes')
+                .delete()
+                .eq('note_id', noteId)
+            if (error) throw error
+            setNotes(notes.filter((n) => n.id !== noteId))
+
+        } catch (error: any) {
+            console.error("Error deleting note:", error)
+            setError(error.message)
+        }
+    }
     const refreshNotes = async () => {
         setIsLoading(true)
         await fetchNotes();
@@ -115,5 +129,8 @@ export function useNoteManager(noteId?: string) {
         saveNote,
 
         // List of notes operations
+        createNote,
+        deleteNote,
+        refreshNotes
     }
 }
