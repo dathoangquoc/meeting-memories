@@ -27,7 +27,11 @@ export default function useAuth() {
             ]);
             
             if (profileResponse.error) throw profileResponse.error;
-
+            setUser({
+                ...profileResponse.data,
+                email: userEmail,
+                notes_created: usageResponse.data?.notes_created || 0
+            });
         } catch (error) {
             console.error("Error fetching user profile:", error)
             await signOut();
@@ -35,7 +39,18 @@ export default function useAuth() {
             setIsLoading(false);
         }
     };
-    const updateSessionState = 0;
+    const updateSessionState = async (newSession: any) => {
+        setSession(newSession);
+        setIsLoggedIn(!!newSession)  // 1st ! convert to bool then invert, 2nd ! invert again 
+
+        if (newSession?.user) {
+            setIsLoading(true);
+            await fetchUserProfile(newSession.user.id, newSession.user.email);
+        } else {
+            setUser(null);
+            setIsLoading(false)
+        }
+    }
 
     // Auth methods
     const signOut = async () => {};
