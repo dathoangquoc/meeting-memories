@@ -14,6 +14,8 @@ export default function useAuth() {
     const [isSignUpMode, setIsSignUpMode] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // Operations
+
     const fetchUserProfile = async (userId: string, userEmail: string) => {
         try {
             const [profileResponse, usageResponse] = await Promise.all([
@@ -117,6 +119,7 @@ export default function useAuth() {
         const initAuth = async () => {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
+                updateSessionState(session)
             } catch (error: any) {
                 console.error("Error initializing auth", error);
                 setError(error.message);
@@ -126,12 +129,14 @@ export default function useAuth() {
 
         initAuth();
 
+        // Subscribe to event listener on auth state changes by providing a callback func
         const { data: { subscription }} = supabase.auth.onAuthStateChange((_event, session) => {
             updateSessionState(session);
         })
 
+        // unsubcribe on clean up
         return () => subscription.unsubscribe()
-    })
+    }, [])
     
     return {
         // States
@@ -145,11 +150,15 @@ export default function useAuth() {
         error,
 
         // Auth methods
-        fetchUserProfile,
-        updateSessionState,
         signOut,
         signIn,
         googleSignIn,
-        signUp
+        signUp,
+        
+        // Operations
+        fetchUserProfile,
+        setEmail,
+        setPassword,
+        setIsSignUpMode
     }
 }
