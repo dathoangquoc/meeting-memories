@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function useAuth() {
     const supabase = createClient();
@@ -10,7 +10,7 @@ export default function useAuth() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(true);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isSignedIn, setIsSignedIn] = useState(false);
     const [isSignUpMode, setIsSignUpMode] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -33,30 +33,105 @@ export default function useAuth() {
                 notes_created: usageResponse.data?.notes_created || 0
             });
         } catch (error) {
-            console.error("Error fetching user profile:", error)
+            console.error("Error fetching user profile:", error);
             await signOut();
         } finally {
             setIsLoading(false);
         }
     };
+
     const updateSessionState = async (newSession: any) => {
         setSession(newSession);
-        setIsLoggedIn(!!newSession)  // 1st ! convert to bool then invert, 2nd ! invert again 
+        setIsSignedIn(!!newSession)  // 1st ! convert to bool then invert, 2nd ! invert again 
 
         if (newSession?.user) {
             setIsLoading(true);
             await fetchUserProfile(newSession.user.id, newSession.user.email);
         } else {
             setUser(null);
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
     // Auth methods
-    const signOut = async () => {};
-    const handleLogin = 0;
-    const handleGoogleLogin = 0;
-    const handleSignUp = 0;
+    const signOut = async () => {
+        try {
+            await supabase.auth.signOut();
+            setSession(null);
+            setUser(null);
+            setIsSignedIn(false);
+            setEmail("");
+            setPassword("");
+        } catch (error: any) {
+            console.error("Error signing out:", error);
+            setError(error.message);
+        }
+    };
+
+    const signIn = async () => {
+        try {
+            const { error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            if (error) throw error;
+
+        } catch (error: any) {
+            console.error("Error logging in:", error);
+            setError(error.message);
+        }
+    };
+
+    const googleSignIn = async () => {
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/dashboard`
+                }
+            });
+            if (error) throw error;
+            
+        } catch (error: any) {
+            console.error("Error logging in via Google:", error);
+            setError(error.message);
+        }
+    };    
+
+    const signUp = async () => {
+        try {
+            const { error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: { emailRedirectTo: `${window.location.origin}/`}
+            });
+            if (error) throw error;
+        } catch (error: any) {
+            console.error("Error signing up:", error);
+            setError(error.message);
+        }
+    };
+
+    // init auth
+    useEffect(() => {
+        const initAuth = async () => {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+            } catch (error: any) {
+                console.error("Error initializing auth", error);
+                setError(error.message);
+                await signOut()
+            }
+        }
+
+        initAuth();
+
+        const { data: { subscription }} = supabase.auth.onAuthStateChange((_event, session) => {
+            updateSessionState(session);
+        })
+
+        return () => subscription.unsubscribe()
+    })
     
     return {
         // States
@@ -65,7 +140,7 @@ export default function useAuth() {
         email,
         password,
         isLoading,
-        isLoggedIn,
+        isSignedIn,
         isSignUpMode,
         error,
 
@@ -73,8 +148,8 @@ export default function useAuth() {
         fetchUserProfile,
         updateSessionState,
         signOut,
-        handleLogin,
-        handleGoogleLogin,
-        handleSignUp
+        signIn,
+        googleSignIn,
+        signUp
     }
 }
