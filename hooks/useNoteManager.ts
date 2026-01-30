@@ -78,7 +78,7 @@ export function useNoteManager(noteId?: string) {
     useEffect(() => {
         if (noteId) return;  // Don't fetch if managing a single note
         fetchNotes()
-    })
+    }, [])
 
     const fetchNotes = async () => {
         try {
@@ -97,7 +97,17 @@ export function useNoteManager(noteId?: string) {
         }
     }
 
-    const createNote = () => {}
+    const createNote = async (title: string, content: string) => {
+        try {
+            const { error } = await supabase
+                .from("notes")
+                .insert({title: title, content: content})
+            if (error) throw error
+        } catch (error: any) {
+            console.error("Error creating note:", error)
+            setError(error.message)
+        }
+    }
     
     const deleteNote = async (noteId: string) => {
         try {
