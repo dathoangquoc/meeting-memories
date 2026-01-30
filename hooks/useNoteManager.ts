@@ -1,16 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
-import { create } from "domain";
-import { waitForDebugger } from "inspector";
-import { AwardIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-
-type Note = {
-    id: string
-    title: string
-    content: string
-    created_at: string
-    updated_at: string
-}
+import { Note } from "@/types/models";
 
 export function useNoteManager(noteId?: string) {
     // State for single note

@@ -1,5 +1,3 @@
-'use client'
-
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 
@@ -7,7 +5,7 @@ export default function useAuth() {
     const supabase = createClient();
     
     // States
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<any>(null);
     const [session, setSession] = useState(null);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -17,43 +15,12 @@ export default function useAuth() {
     const [error, setError] = useState<string | null>(null);
 
     // Operations
-
-    const fetchUserProfile = async (userId: string, userEmail: string) => {
-        try {
-            const [
-                profileResponse, 
-                // usageResponse
-            ] = await Promise.all([
-                supabase.from("profiles").select("*").eq("user_id", userId).single(),
-                // supabase
-                //     .from("usage_tracking")
-                //     .select("notes_created")
-                //     .eq("user_id", userId)
-                //     .eq("year_month", new Date().toISOString().slice(0, 7))
-                //     .maybeSingle(),
-            ]);
-            
-            if (profileResponse.error) throw profileResponse.error;
-            setUser({
-                ...profileResponse.data,
-                email: userEmail,
-                // notes_created: usageResponse.data?.notes_created || 0
-            });
-        } catch (error) {
-            console.error("Error fetching user profile:", error);
-            await signOut();
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const updateSessionState = async (newSession: any) => {
         setSession(newSession);
         setIsSignedIn(!!newSession)  // 1st ! convert to bool then invert, 2nd ! invert again 
 
         if (newSession?.user) {
             setIsLoading(true);
-            await fetchUserProfile(newSession.user.id, newSession.user.email);
         } else {
             setUser(null);
             setIsLoading(false);
@@ -82,6 +49,7 @@ export default function useAuth() {
                 password: password
             });
             if (error) throw error;
+
         } catch (error: any) {
             console.error("Error logging in:", error);
             setError(error.message);
@@ -122,7 +90,8 @@ export default function useAuth() {
     useEffect(() => {
         const initAuth = async () => {
             try {
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { user  } } = await supabase.auth.getUser();
+                setUser(user)
                 updateSessionState(session)
             } catch (error: any) {
                 console.error("Error initializing auth", error);
@@ -160,7 +129,6 @@ export default function useAuth() {
         signUp,
         
         // Operations
-        fetchUserProfile,
         setEmail,
         setPassword,
         setIsSignUpMode

@@ -26,7 +26,7 @@ export default function Home() {
     <main className="min-h-screen flex flex-col items-center bg-background text-foreground">
       <header className="sticky top-0 z-10 p-4 flex justify-between w-full bg-muted rounded-b-lg align-middle">
       <h1 className="h-full text-2xl">Meeting Memories</h1>
-      <CreateNoteDialog onSubmit={handleCreateTask}/>
+      <CreateNoteDialog onSubmit={handleCreateTask} userId={user.id}/>
       <Button asChild variant="ghost">
         <Link href="/login">Log In</Link>
       </Button>

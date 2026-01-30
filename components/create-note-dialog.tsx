@@ -21,28 +21,29 @@ import { Input } from "@/components/ui/input"
 import { useState } from "react";
 
 interface CreateNoteDialogProps {
-    onSubmit: (title: string, content: string) => Promise<void>; 
+  onSubmit: (title: string, content: string, userId: string) => Promise<void>;
+  userId: string;
 }
 
-export function CreateNoteDialog({ onSubmit }: CreateNoteDialogProps) {
+export function CreateNoteDialog({ onSubmit, userId }: CreateNoteDialogProps) {
     const [title, setTitle] = useState("")
     const [content, setContent] = useState("")
     const [error, setError] = useState<string | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(null);
-        setIsSubmitting(true);
-        try {
-            await onSubmit(title, content);
-            setTitle("");
-            setContent("");
-        } catch (err: any) {
-            setError(err.messsage)
-        } finally {
-            setIsSubmitting(false)
-        }
+      e.preventDefault();
+      setError(null);
+      setIsSubmitting(true);
+      try {
+        await onSubmit(title, content, userId);
+        setTitle("");
+        setContent("");
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
     
     return (
@@ -66,13 +67,16 @@ export function CreateNoteDialog({ onSubmit }: CreateNoteDialogProps) {
                         type="text"
                         placeholder="Super duper important meeting"
                         required
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
                     />
                 </Field>
                 <Field>
                     <FieldLabel htmlFor="content">Content</FieldLabel>
-                    <Textarea id="content" placeholder="All the details here" />
+                    <Textarea id="content" placeholder="All the details here" value={content} onChange={e => setContent(e.target.value)} />
                 </Field>
-                <Button type="submit">Submit</Button>
+                {error && <div className="text-red-500 text-sm">{error}</div>}
+                <Button type="submit" disabled={isSubmitting}>Submit</Button>
             </FieldGroup>
         </form>
       </DialogContent>
