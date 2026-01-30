@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useNoteManager } from "@/hooks/useNoteManager";
 import NoteList from "@/components/note-list";
 import { CreateNoteDialog } from "@/components/create-note-dialog";
+import useAuth from "@/hooks/useAuth";
 
 export default function Home() {
   const {
@@ -14,6 +15,7 @@ export default function Home() {
     refreshNotes
   } = useNoteManager()
 
+  const { user } = useAuth()
   const handleCreateTask = async (title: string, content: string) => {
     await createNote(title, content);
     await refreshNotes();

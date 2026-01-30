@@ -20,12 +20,12 @@ create trigger on_auth_user_created
 -- Security policy: Users can read their own profile
 create policy "Users can read own profile"
 on public.profiles for select
-using (auth.uid() = user_id);
+using ( (select auth.uid()) = user_id);
 
 -- Security policy: Users can CRUD their own notes
 create policy "Users can CRUD own notes"
 on public.notes for all
-using (auth.uid() = user_id);
+using ( (select auth.uid()) = user_id);
 
 -- Enable RLS
 alter table public.profiles enable row level security;

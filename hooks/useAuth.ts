@@ -1,3 +1,5 @@
+'use client'
+
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 
@@ -18,21 +20,24 @@ export default function useAuth() {
 
     const fetchUserProfile = async (userId: string, userEmail: string) => {
         try {
-            const [profileResponse, usageResponse] = await Promise.all([
+            const [
+                profileResponse, 
+                // usageResponse
+            ] = await Promise.all([
                 supabase.from("profiles").select("*").eq("user_id", userId).single(),
-                supabase
-                    .from("usage_tracking")
-                    .select("notes_created")
-                    .eq("user_id", userId)
-                    .eq("year_month", new Date().toISOString().slice(0, 7))
-                    .maybeSingle(),
+                // supabase
+                //     .from("usage_tracking")
+                //     .select("notes_created")
+                //     .eq("user_id", userId)
+                //     .eq("year_month", new Date().toISOString().slice(0, 7))
+                //     .maybeSingle(),
             ]);
             
             if (profileResponse.error) throw profileResponse.error;
             setUser({
                 ...profileResponse.data,
                 email: userEmail,
-                notes_created: usageResponse.data?.notes_created || 0
+                // notes_created: usageResponse.data?.notes_created || 0
             });
         } catch (error) {
             console.error("Error fetching user profile:", error);
@@ -77,7 +82,6 @@ export default function useAuth() {
                 password: password
             });
             if (error) throw error;
-
         } catch (error: any) {
             console.error("Error logging in:", error);
             setError(error.message);

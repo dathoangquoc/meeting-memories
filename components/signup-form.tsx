@@ -1,3 +1,5 @@
+'use client'
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -14,8 +16,23 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
+import useAuth from "@/hooks/useAuth"
+import React from "react"
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
+  const {
+      email,
+      setEmail,
+      password,
+      setPassword,
+      signUp,
+    } = useAuth();
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    signUp()
+  }
+
   return (
     <Card {...props}>
       <CardHeader>
@@ -25,12 +42,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form>
+        <form onSubmit={handleSignUp}>
           <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="name">Full Name</FieldLabel>
-              <Input id="name" type="text" placeholder="John Doe" required />
-            </Field>
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
@@ -38,6 +51,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 type="email"
                 placeholder="m@example.com"
                 required
+                value={email}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {setEmail(e.target.value)}} 
               />
               <FieldDescription>
                 We&apos;ll use this to contact you. We will not share your email
@@ -55,7 +70,13 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               <FieldLabel htmlFor="confirm-password">
                 Confirm Password
               </FieldLabel>
-              <Input id="confirm-password" type="password" required />
+              <Input 
+                id="confirm-password" 
+                type="password" 
+                required 
+                value={password}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {setPassword(e.target.value)}}                 
+              />
               <FieldDescription>Please confirm your password.</FieldDescription>
             </Field>
             <FieldGroup>
