@@ -4,8 +4,12 @@ export default function LandingPage() {
     return (
         <main>
             <p>Hello</p>
-            <Link href="/login">Log In</Link>
-            <Link href="/signup">Sign Up</Link>
+            <p>
+                <Link href="/login">Log In</Link>
+            </p>
+            <p>
+                <Link href="/signup">Sign Up</Link>
+            </p>
         </main>
     )
 }

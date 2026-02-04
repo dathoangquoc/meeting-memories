@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { Note } from "@/types/models";
-import useAuth from "./useAuth";
+import { useAuth } from "@/context/AuthContext";
 
 const FUNCTION_ENDPOINT = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-note-with-ai`;
 
@@ -95,13 +95,18 @@ export function useNoteManager(noteId?: string) {
     const { user } = useAuth()
 
     const createNote = async (title: string, content: string) => {
+        if (!user) {
+            setError("You must be logged in to create a note.");
+            return;
+        }
+
         try {
             const { error } = await supabase
                 .from("notes")
                 .insert({
                     title, 
                     content,
-                    user_id: user.id
+                    user_id: user?.id
                 })
             if (error) throw error
             console.log(`Created note: ${title}`)

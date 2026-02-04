@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import useAuth from "@/hooks/useAuth";
+import { useAuth } from "@/context/AuthContext";
 import { Spinner } from "./ui/8bit/spinner";
 
 const PUBLIC_ROUTES = ["/", "/signup", "/login"];
