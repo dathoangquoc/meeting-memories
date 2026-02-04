@@ -9,7 +9,7 @@ import { Note } from "@/types/models";
 
 interface SingleNoteProps {
   note: Note
-  onDelete: (taskId: string) => Promise<void>;
+  onDelete: (noteId: string) => Promise<void>;
 }
 
 export function SingleNote({ note, onDelete }: SingleNoteProps) {
@@ -17,7 +17,7 @@ export function SingleNote({ note, onDelete }: SingleNoteProps) {
     <Card className="mx-auto w-full max-w-sm max-h-80">
       <CardHeader className="flex justify-between">
         <CardTitle>{note.title ?? "Empty"}</CardTitle>
-        <Button variant="destructive" onClick={() => {onDelete(note.id)}}>Delete</Button>
+        <Button variant="destructive" onClick={() => {onDelete(note.note_id)}}>Delete</Button>
       </CardHeader>
       <CardContent className="max-h-full">
         <p className="overflow-y-scroll max-h-52">

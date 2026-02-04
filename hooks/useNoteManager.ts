@@ -1,6 +1,9 @@
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { Note } from "@/types/models";
+import useAuth from "./useAuth";
+
+const FUNCTION_ENDPOINT = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-note-with-ai`;
 
 export function useNoteManager(noteId?: string) {
     // State for single note
@@ -56,7 +59,9 @@ export function useNoteManager(noteId?: string) {
                     ...noteData,
                     updated_at: new Date().toISOString()
                 })
-                .eq('note_id', noteData.id)
+                .eq('note_id', noteData.note_id)
+            
+                if (error) throw error
         } catch (error: any) {
             console.error("Error saving note:", error);
             setError(error.message);
@@ -87,12 +92,19 @@ export function useNoteManager(noteId?: string) {
         }
     }
 
+    const { user } = useAuth()
+
     const createNote = async (title: string, content: string) => {
         try {
             const { error } = await supabase
                 .from("notes")
-                .insert({title: title, content: content})
+                .insert({
+                    title, 
+                    content,
+                    user_id: user.id
+                })
             if (error) throw error
+            console.log(`Created note: ${title}`)
         } catch (error: any) {
             console.error("Error creating note:", error)
             setError(error.message)
@@ -106,7 +118,7 @@ export function useNoteManager(noteId?: string) {
                 .delete()
                 .eq('note_id', noteId)
             if (error) throw error
-            setNotes(notes.filter((n) => n.id !== noteId))
+            setNotes(notes.filter((n) => n.note_id !== noteId))
 
         } catch (error: any) {
             console.error("Error deleting note:", error)

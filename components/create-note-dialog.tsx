@@ -21,11 +21,10 @@ import { Input } from "@/components/ui/input"
 import { useState } from "react";
 
 interface CreateNoteDialogProps {
-  onSubmit: (title: string, content: string, userId: string) => Promise<void>;
-  userId: string;
+  onSubmit: (title: string, content: string) => Promise<void>;
 }
 
-export function CreateNoteDialog({ onSubmit, userId }: CreateNoteDialogProps) {
+export function CreateNoteDialog({ onSubmit }: CreateNoteDialogProps) {
     const [title, setTitle] = useState("")
     const [content, setContent] = useState("")
     const [error, setError] = useState<string | null>(null)
@@ -36,7 +35,7 @@ export function CreateNoteDialog({ onSubmit, userId }: CreateNoteDialogProps) {
       setError(null);
       setIsSubmitting(true);
       try {
-        await onSubmit(title, content, userId);
+        await onSubmit(title, content);
         setTitle("");
         setContent("");
       } catch (err: any) {

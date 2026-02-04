@@ -6,7 +6,6 @@ export default function useAuth() {
     
     // States
     const [user, setUser] = useState<any>(null);
-    const [session, setSession] = useState(null);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(true);
@@ -14,24 +13,10 @@ export default function useAuth() {
     const [isSignUpMode, setIsSignUpMode] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Operations
-    const updateSessionState = async (newSession: any) => {
-        setSession(newSession);
-        setIsSignedIn(!!newSession)  // 1st ! convert to bool then invert, 2nd ! invert again 
-
-        if (newSession?.user) {
-            setIsLoading(true);
-        } else {
-            setUser(null);
-            setIsLoading(false);
-        }
-    }
-
     // Auth methods
     const signOut = async () => {
         try {
             await supabase.auth.signOut();
-            setSession(null);
             setUser(null);
             setIsSignedIn(false);
             setEmail("");
@@ -86,35 +71,38 @@ export default function useAuth() {
         }
     };
 
+    const updateUserState = async () => {
+        setIsLoading(true);
+        try {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (error) throw error;
+            setUser(user || null);
+            setIsSignedIn(!!user);
+        } catch (error: any) {
+            setUser(null);
+            setIsSignedIn(false);
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     // init auth
     useEffect(() => {
-        const initAuth = async () => {
-            try {
-                const { data: { user  } } = await supabase.auth.getUser();
-                setUser(user)
-                updateSessionState(session)
-            } catch (error: any) {
-                console.error("Error initializing auth", error);
-                setError(error.message);
-                await signOut()
-            }
-        }
-
-        initAuth();
+        updateUserState();
 
         // Subscribe to event listener on auth state changes by providing a callback func
-        const { data: { subscription }} = supabase.auth.onAuthStateChange((_event, session) => {
-            updateSessionState(session);
-        })
+        const { data: { subscription }} = supabase.auth.onAuthStateChange(async () => {
+            await updateUserState();
+        });
 
         // unsubcribe on clean up
-        return () => subscription.unsubscribe()
-    }, [])
+        return () => subscription.unsubscribe();
+    }, []);
     
     return {
         // States
         user,
-        session,
         email,
         password,
         isLoading,

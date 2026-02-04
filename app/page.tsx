@@ -19,14 +19,13 @@ export default function Home() {
   const handleCreateTask = async (title: string, content: string) => {
     await createNote(title, content);
     await refreshNotes();
-    console.log(`New note created: ${title}` )
   }
 
   return (
     <main className="min-h-screen flex flex-col items-center bg-background text-foreground">
       <header className="sticky top-0 z-10 p-4 flex justify-between w-full bg-muted rounded-b-lg align-middle">
       <h1 className="h-full text-2xl">Meeting Memories</h1>
-      <CreateNoteDialog onSubmit={handleCreateTask} userId={user.id}/>
+      <CreateNoteDialog onSubmit={handleCreateTask}/>
       <Button asChild variant="ghost">
         <Link href="/login">Log In</Link>
       </Button>

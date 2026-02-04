@@ -11,7 +11,7 @@ export default function NoteList({ notes, onDelete }: NoteListProps) {
       <div className="grid grid-cols-[repeat(auto-fit,minmax(380px,1fr))] content-start gap-4 w-full min-h-screen p-2">
         {notes.map((note: Note) => (
             <SingleNote
-              key={note.id}
+              key={note.note_id}
               note={note}
               onDelete={onDelete}
             />
