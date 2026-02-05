@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNoteManager } from "@/hooks/useNoteManager";
 import NoteList from "@/components/note-list";
 import { CreateNoteDialog } from "@/components/create-note-dialog";
-import useAuth from "@/hooks/useAuth";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
   const {
