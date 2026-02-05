@@ -33,7 +33,7 @@ export default function RouteGuard({
 
   const isRedirecting = (isSignedIn && isPublicRoute) || (!isSignedIn && !isPublicRoute) 
 
-  if (isLoading || isRedirecting) return <Spinner variant="diamond" className="size-40 w-screen h-screen"/>;
+  if (isLoading || isRedirecting) return <Spinner variant="diamond" className="size-40 w-1/20 h-1/20 mx-auto mt-10"/>;
 
   return <>{children}</>;
 }

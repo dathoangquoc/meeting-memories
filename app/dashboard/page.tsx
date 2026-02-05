@@ -6,7 +6,7 @@ import NoteList from "@/components/note-list";
 import { CreateNoteDialog } from "@/components/create-note-dialog";
 import { useAuth } from "@/context/AuthContext";
 
-export default function Home() {
+export default function Dashboard() {
   const {
     notes,
     createNote,

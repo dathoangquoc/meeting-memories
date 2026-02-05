@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
-import useAuth from "@/hooks/useAuth"
+import { useAuth } from "@/context/AuthContext"
 import React from "react"
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
