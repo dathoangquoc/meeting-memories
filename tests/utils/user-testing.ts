@@ -21,6 +21,7 @@ export async function getOrCreateTestUser({
 
     // If user exists, return user
     if (data.user) {
+      console.log("✅ Test User Logged In")
       return {
         id: data.user.id,
         email: email,
@@ -38,7 +39,7 @@ export async function getOrCreateTestUser({
   });
   if (error) throw error;
   if (!data.user) throw new Error("User creation failed");
-
+  console.log("✅ Test User Signed Up")
   return {
     id: data.user.id,
     email: email,
