@@ -1,4 +1,4 @@
-import { supabase } from "./supabase-client";
+import { supabase, supabaseAdmin } from "./supabase-client";
 
 export interface TestUser {
   id?: string;
@@ -11,25 +11,20 @@ export async function getOrCreateTestUser({
   email,
   password,
 }: TestUser): Promise<TestUser> {
-  // Try to sign in first
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
+   // Try to sign in first
+  const { data: signInData, error: signInError } =
+    await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    if (error) throw error;
 
-    // If user exists, return user
-    if (data.user) {
-      console.log("✅ Test User Logged In")
-      return {
-        id: data.user.id,
-        email: email,
-        password: password,
-      };
-    }
-  } catch (error: any) {
-    console.error(error.message);
+  // If user exists, return it
+  if (signInData.user) {
+    return {
+      id: signInData.user.id,
+      email,
+      password,
+    };
   }
 
   // If user doesn't exist, signup user
@@ -49,6 +44,6 @@ export async function getOrCreateTestUser({
 
 export async function cleanupTestUser(userId?: string) {
     if (!userId) return;
-    const { error } = await supabase.auth.admin.deleteUser(userId)
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId)
     if (error) throw error
 }
