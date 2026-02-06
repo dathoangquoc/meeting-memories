@@ -46,4 +46,8 @@ export async function getOrCreateTestUser({
   };
 }
 
-export async function cleanupTestUser(userId: string) {}
+export async function cleanupTestUser(userId?: string) {
+    if (!userId) return;
+    const { error } = await supabase.auth.admin.deleteUser(userId)
+    if (error) throw error
+}
