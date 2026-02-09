@@ -3,35 +3,59 @@
 // This enables autocomplete, go to definition, etc.
 
 // Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts"
-import { GoogleGenAI } from 'npm:@google/genai'
-
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 Deno.serve(async (req) => {
   // Accept POST requests
-  const { title, content } = await req.json()
-  const ai = new GoogleGenAI({});
-  
+  if (req.method !== "POST") {
+    return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  const { title, content } = await req.json();
+
   // Check is req is authorized
 
+  // development only
+  title = "New client"
+  content = `sarah: okay team quick standup on the cloud migration. marcus what is the status of the database transfer? marcus: we are moving the legacy data to the new instance now.`
+
   // LLM call
-  const prompt = `Based on the following transcription of a meeting title ${title}, write a summary of the meeting. Reply with just the summary and nothing else.`
+  const url =
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
+  const prompt = `
+  Based on the following transcription of a meeting titled "${title}", write a summary of the meeting. 
+  Reply with just the summary and nothing else.
+  ### TRANSCRIPTION
+  ${content}
+  `;
 
-  const completion = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: "Explain how AI works in a few words",
-  })
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "x-goog-api-key": process.env.GEMINI_API_KEY,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      contents: [
+        {
+          parts: [
+            {
+              text: prompt,
+            },
+          ],
+        },
+      ],
+    }),
+  });
 
-  console.log("LLM response:", completion.text)
+  console.log("LLM response:", res.json());
 
   // Insert note
-  
 
-  return new Response(
-    JSON.stringify(completion.text),
-    { headers: { "Content-Type": "application/json" } },
-  )
-})
+  return new Response(JSON.stringify(completion.text), {
+    headers: { "Content-Type": "application/json" },
+  });
+});
 
 /* To invoke locally:
 
