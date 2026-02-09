@@ -11,8 +11,9 @@ const TEST_USER_TIMMY = {
   password: "Timtest123!",
 };
 
-describe("Suite 1: Note CRUD", () => {
+describe("Suite 2: Note CRUD", () => {
   let testUser: TestUser;
+
   beforeAll(async () => {
     testUser = await getOrCreateTestUser(TEST_USER_TIMMY);
     console.log("Logged in with", testUser);
