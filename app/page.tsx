@@ -1,15 +1,14 @@
 import Link from "next/link"
+import { HeroHeader } from "@/components/header"
+import HeroSection from "@/components/hero-section"
+import Pricing from "@/components/pricing-3"
 
 export default function LandingPage() {
     return (
         <main>
-            <p>Hello</p>
-            <p>
-                <Link href="/login">Log In</Link>
-            </p>
-            <p>
-                <Link href="/signup">Sign Up</Link>
-            </p>
+            <HeroHeader/>
+            <HeroSection/>
+            <Pricing/>
         </main>
     )
 }
