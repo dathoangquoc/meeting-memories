@@ -45,9 +45,6 @@ export function useNoteManager(noteId?: string) {
         fetchNote();
     }, [noteId])
 
-    const updateNote = (updates: Partial<Note>) => {
-        setNote((prev) => prev ? {...prev, ...updates} : null);
-    };
     const saveNote = async (noteToSave?: Note) => {
         try {
             const noteData = noteToSave || note;
@@ -60,8 +57,7 @@ export function useNoteManager(noteId?: string) {
                     updated_at: new Date().toISOString()
                 })
                 .eq('note_id', noteData.note_id)
-            
-                if (error) throw error
+            if (error) throw error
         } catch (error: any) {
             console.error("Error saving note:", error);
             setError(error.message);
@@ -142,7 +138,6 @@ export function useNoteManager(noteId?: string) {
         error,
 
         // Single note operations
-        updateNote,
         saveNote,
 
         // List of notes operations

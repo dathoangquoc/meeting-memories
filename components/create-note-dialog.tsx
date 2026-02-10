@@ -1,19 +1,15 @@
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
-import { useNoteManager } from "@/hooks/useNoteManager"
 import {
   Field,
-  FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
@@ -57,7 +53,7 @@ export function CreateNoteDialog({ onSubmit }: CreateNoteDialogProps) {
             Paste the meeting log here and the AI will create the note for you.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} autoComplete="off">
             <FieldGroup>
                 <Field>
                     <FieldLabel htmlFor="title">Title</FieldLabel>

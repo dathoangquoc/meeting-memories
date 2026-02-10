@@ -3,17 +3,19 @@ import { Note } from "@/types/models";
 
 interface NoteListProps {
   notes: Note[],
-  onDelete: (noteId: string) => Promise<void>; 
+  onDelete: (noteId: string) => Promise<void>;
+  onSave: (noteToSave?: Note) => Promise<void>; 
 }
 
-export default function NoteList({ notes, onDelete }: NoteListProps) {
+export default function NoteList({ notes, onDelete, onSave }: NoteListProps) {
     return (
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(380px,1fr))] content-start gap-4 w-full min-h-screen p-2">
+      <div className="flex flex-wrap gap-4 w-full h-fit overflow-auto p-2">
         {notes.map((note: Note) => (
             <SingleNote
               key={note.note_id}
               note={note}
               onDelete={onDelete}
+              onSave={onSave}
             />
         ))}
       </div>
