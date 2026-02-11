@@ -1,4 +1,3 @@
-import React from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -10,9 +9,6 @@ import { Twilio } from '@/components/ui/svgs/twilio'
 import { Linear } from '@/components/ui/svgs/linear'
 import { Figma } from '@/components/ui/svgs/figma'
 import { Vercel } from '@/components/ui/svgs/vercel'
-import { Firebase } from '@/components/ui/svgs/firebase'
-import { ClerkIconLight as Clerk } from '@/components/ui/svgs/clerk'
-import { Claude } from '@/components/ui/svgs/claude'
 import Image from 'next/image'
 
 export default function HeroSection() {
@@ -59,7 +55,7 @@ export default function HeroSection() {
                                         </Card>
                                     </div>
                                     <div>
-                                        <Card className="shadow-foreground/10 mx-a flex h-10 h-8 w-fit items-center gap-2 rounded-xl px-3 sm:h-10 sm:px-4">
+                                        <Card className="shadow-foreground/10 mx-auto flex h-8 w-fit items-center gap-2 rounded-xl px-3 sm:h-10 sm:px-4">
                                             <Linear className="size-3 sm:size-4" />
                                             <span className="text-nowrap font-medium max-sm:text-xs">Linear</span>
                                         </Card>

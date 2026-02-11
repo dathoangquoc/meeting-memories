@@ -45,6 +45,7 @@ export function UpdateNoteDialog({
       <DialogTrigger asChild>
         <Button
           variant="outline"
+          size="icon"
         >
           <Pencil />
         </Button>

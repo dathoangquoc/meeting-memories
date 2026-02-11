@@ -138,7 +138,7 @@ const FloatingNavPill = ({ isScrolled }: { isScrolled: boolean }) => {
                                 asChild
                                 size="sm"
                                 className="mx-2 gap-1 pr-1">
-                                <Link href="#">
+                                <Link href="/login">
                                     <span>Get started</span>
                                     <ChevronRight className="opacity-50" />
                                 </Link>
