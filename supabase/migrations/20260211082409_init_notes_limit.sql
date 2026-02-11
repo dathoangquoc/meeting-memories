@@ -1,6 +1,6 @@
 -- func to check notes limit per user
 create or replace function public.check_notes_limit()
-return trigger
+returns trigger
 language plpgsql
 as $$ 
 declare

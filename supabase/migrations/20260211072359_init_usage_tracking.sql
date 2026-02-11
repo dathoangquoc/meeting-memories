@@ -10,12 +10,12 @@ alter table usage_tracking enable row level security;
 
 -- func to increment notes_created when a note is created
 create or replace function public.increment_notes_created()
-return trigger
+returns trigger
 language plpgsql
 as $$
 begin
     insert into usage_tracking (user_id, year_month, notes_created)
-    values (new.user_id, to_char(now(), 'YYYY-MM'), 1);
+    values (new.user_id, to_char(now(), 'YYYY-MM'), 1)
     on conflict (user_id, year_month)
     do update set notes_created = usage_tracking.notes_created + 1;
     return new;
