@@ -12,7 +12,7 @@ begin
     current_month := to_char(now(), 'YYYY-MM');
 
     -- Get user's note limit from profiles table
-    select note_limit into user_limit from public.profiles where user_id = new.user_id;
+    select notes_limit into user_limit from public.profiles where user_id = new.user_id;
 
     -- Get current month's note count from usage_tracking table
     select notes_created into monthly_count 

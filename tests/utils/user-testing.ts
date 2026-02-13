@@ -11,7 +11,7 @@ export async function getOrCreateTestUser({
   email,
   password,
 }: TestUser): Promise<TestUser> {
-   // Try to sign in first
+  // Try to sign in first
   const { data: signInData, error: signInError } =
     await supabase.auth.signInWithPassword({
       email,
@@ -34,7 +34,7 @@ export async function getOrCreateTestUser({
   });
   if (error) throw error;
   if (!data.user) throw new Error("User creation failed");
-  console.log("✅ Test User Signed Up")
+  console.log("✅ Test User Signed Up");
   return {
     id: data.user.id,
     email: email,
@@ -43,7 +43,19 @@ export async function getOrCreateTestUser({
 }
 
 export async function cleanupTestUser(userId?: string) {
-    if (!userId) return;
-    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId)
-    if (error) throw error
+  if (!userId) return;
+  const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+  if (error) throw error;
+}
+
+export async function createTestNote(userId: string, title: string) {
+  const { data, error } = await supabase
+    .from("notes")
+    .insert({
+      user_id: userId,
+      title: title,
+      content: "This note was created from testing",
+    })
+    .select();
+  return { data, error };
 }
