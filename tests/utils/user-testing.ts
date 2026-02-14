@@ -34,7 +34,6 @@ export async function getOrCreateTestUser({
   });
   if (error) throw error;
   if (!data.user) throw new Error("User creation failed");
-  console.log("✅ Test User Signed Up");
   return {
     id: data.user.id,
     email: email,

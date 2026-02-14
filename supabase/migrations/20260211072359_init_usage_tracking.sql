@@ -12,6 +12,7 @@ alter table usage_tracking enable row level security;
 create or replace function public.increment_notes_created()
 returns trigger
 language plpgsql
+security definer
 as $$
 begin
     insert into usage_tracking (user_id, year_month, notes_created)

@@ -16,13 +16,11 @@ describe("Suite 2: Note CRUD", () => {
 
   beforeAll(async () => {
     testUser = await getOrCreateTestUser(TEST_USER_TIMMY);
-    console.log("Logged in with", testUser);
     expect(testUser.id).toBeDefined();
   });
 
   afterAll(async () => {
     await cleanupTestUser(testUser.id);
-    console.log("Deleted user:", testUser.id);
   });
 
   test("can create note", async () => {

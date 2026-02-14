@@ -22,18 +22,12 @@ describe("Suite 1: Auth", () => {
   let testUserScott: TestUser;
   beforeAll(async () => {
     testUserClay = await getOrCreateTestUser(TEST_USER_CLAY);
-    console.log("Logged in with", testUserClay);
-
     testUserScott = await getOrCreateTestUser(TEST_USER_SCOTT);
-    console.log("Logged in with", testUserScott);
   }, 15_000);
 
   afterAll(async () => {
     await cleanupTestUser(testUserClay.id);
-    console.log("Deleted user:", testUserClay.id);
-
     await cleanupTestUser(testUserScott.id);
-    console.log("Deleted user:", testUserScott.id);
   }, 15_000);
 
   test("user cannot edit others note", async () => {

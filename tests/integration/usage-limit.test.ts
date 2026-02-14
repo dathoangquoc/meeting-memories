@@ -23,13 +23,11 @@ describe("Suite 3: Usage Limit", () => {
 
   beforeAll(async () => {
     testUser = await getOrCreateTestUser(TEST_USER_FREEMAN);
-    console.log("Logged in with", testUser);
     expect(testUser.id).toBeDefined();
   });
 
   afterAll(async () => {
     await cleanupTestUser(testUser.id);
-    console.log("Deleted user:", testUser.id);
   });
 
   test("free user cannot exceed note limit", async () => {
@@ -44,12 +42,12 @@ describe("Suite 3: Usage Limit", () => {
   test("limits increase after upgrade to premium", async () => {
     await setUserSubscription(testUser.id!, "premium");
     const { data, error } = await supabase
-    .from('profiles')
-    .select()
-    .eq('user_id', testUser.id)
+      .from("profiles")
+      .select()
+      .eq("user_id", testUser.id);
 
-    expect(data![0].notes_limit).toBe(NOTE_LIMITS.PREMIUM)
-    expect(error).toBeFalsy()
+    expect(data![0].notes_limit).toBe(NOTE_LIMITS.PREMIUM);
+    expect(error).toBeFalsy();
   });
 
   test("premium user cannot exceed note limit", async () => {
@@ -61,5 +59,5 @@ describe("Suite 3: Usage Limit", () => {
     expect(error).toBeTruthy();
   });
 
-//   test("limits decrease after no longer premium");
+  //   test("limits decrease after no longer premium");
 });

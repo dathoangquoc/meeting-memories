@@ -19,5 +19,5 @@ $$;
 
 -- trigger to call on plan change
 create trigger on_account_plan_change
-    before update of subscription_plan on public.profiles
+    after update of subscription_plan on public.profiles
     for each row execute function update_notes_limit_on_plan_change();
