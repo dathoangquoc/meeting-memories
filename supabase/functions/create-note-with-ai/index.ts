@@ -3,58 +3,99 @@
 // This enables autocomplete, go to definition, etc.
 
 // Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import "@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "@supabase/supabase-js";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
+
+// Load env variables
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? "";
 
 Deno.serve(async (req) => {
-  // Accept POST requests
-  if (req.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405 });
+  // Accept preflight requests
+  if (req.method !== "OPTIONS") {
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
-  const { title, content } = await req.json();
+  try {
+    const { title, content } = await req.json();
 
-  // Check is req is authorized
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header");
 
-  // development only
-  title = "New client"
-  content = `sarah: okay team quick standup on the cloud migration. marcus what is the status of the database transfer? marcus: we are moving the legacy data to the new instance now.`
+    const supabase = await createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: {
+        headers: { Authorization: authHeader },
+      },
+    });
 
-  // LLM call
-  const url =
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
-  const prompt = `
+    // LLM call
+    const url =
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
+    const prompt = `
   Based on the following transcription of a meeting titled "${title}", write a summary of the meeting. 
   Reply with just the summary and nothing else.
   ### TRANSCRIPTION
   ${content}
   `;
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "x-goog-api-key": process.env.GEMINI_API_KEY,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      contents: [
-        {
-          parts: [
-            {
-              text: prompt,
-            },
-          ],
-        },
-      ],
-    }),
-  });
+    const completion = await fetch(url, {
+      method: "POST",
+      headers: {
+        "x-goog-api-key": GEMINI_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
+      }),
+    });
 
-  console.log("LLM response:", res.json());
+    const responseJson = await completion.json();
+    const summaryText = responseJson.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
-  // Insert note
+    console.log("LLM response:", summaryText);
 
-  return new Response(JSON.stringify(completion.text), {
-    headers: { "Content-Type": "application/json" },
-  });
+    // Get user session
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error("No user found")
+    
+    // Insert note
+    const { data, error } = await supabase
+    .from('notes')
+    .insert({
+      title: "Made by Gemini",
+      content: summaryText,
+      user_id: user.id
+    })
+    .select()
+    .single()
+
+    if (error) throw error
+
+    return new Response(JSON.stringify(data), {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error: unknown) {
+    console.error(error);
+    return new Response();
+  }
 });
 
 /* To invoke locally:
