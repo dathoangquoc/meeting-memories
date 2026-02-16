@@ -12,6 +12,7 @@ export default function Dashboard() {
   const {
     notes,
     createNote,
+    createNoteWithLLM,
     saveNote,
     deleteNote,
     refreshNotes
@@ -36,7 +37,7 @@ export default function Dashboard() {
     <main className="min-h-screen flex flex-col items-center bg-background text-foreground">
       <header className="sticky top-0 z-10 p-4 flex justify-between w-full bg-muted rounded-b-lg align-middle">
       <h1 className="h-full text-2xl">Meeting Memories</h1>
-      <CreateNoteDialog onSubmit={handleCreateNote}/>
+      <CreateNoteDialog onSubmit={createNoteWithLLM}/>
       <Button variant="ghost" onClick={handleSignOut}>Sign Out</Button>
       </header>
       {notes.length > 0 ? (

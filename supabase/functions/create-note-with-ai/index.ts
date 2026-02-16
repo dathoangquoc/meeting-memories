@@ -18,9 +18,10 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? "";
 
+
 Deno.serve(async (req) => {
   // Accept preflight requests
-  if (req.method !== "OPTIONS") {
+  if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
 
@@ -89,12 +90,16 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify(data), {
       headers: {
+        ...corsHeaders,
         "Content-Type": "application/json",
       },
     });
   } catch (error: unknown) {
     console.error(error);
-    return new Response();
+    return new Response(JSON.stringify({ error: String(error) }), {
+      status: 500,
+      headers: corsHeaders,
+    });
   }
 });
 

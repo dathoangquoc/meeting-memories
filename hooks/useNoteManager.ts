@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { Note } from "@/types/models";
 import { useAuth } from "@/context/AuthContext";
+import { title } from "process";
 
 const FUNCTION_ENDPOINT = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-note-with-ai`;
 
@@ -95,7 +96,6 @@ export function useNoteManager(noteId?: string) {
             setError("You must be logged in to create a note.");
             return;
         }
-
         try {
             const { error } = await supabase
                 .from("notes")
@@ -108,6 +108,45 @@ export function useNoteManager(noteId?: string) {
             console.log(`Created note: ${title}`)
         } catch (error: any) {
             console.error("Error creating note:", error)
+            setError(error.message)
+        }
+    }
+
+    const createNoteWithLLM = async (title: string, content: string) => {
+        if (!user) {
+            setError("You must be logged in to create a note")
+            return;
+        }
+        try {
+            const { data, error } = await supabase.auth.getSession()
+            if (error) throw error;
+
+            const token = data.session?.access_token
+
+            const res = await fetch(
+                FUNCTION_ENDPOINT, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({title, content})
+                }
+            )
+
+            if (!res.ok) {
+                const errorRes = await res.json();
+                throw new Error(errorRes.message || "Failed to create note with LLM")
+            }
+
+            const noteData = await res.json();
+            if (!noteData) throw new Error("No data returned from server");
+
+            console.log("LLM created:", noteData[0].title)
+            await refreshNotes()
+
+        } catch (error: any) {
+            console.error("Error calling edge function:", error.message)
             setError(error.message)
         }
     }
@@ -142,6 +181,7 @@ export function useNoteManager(noteId?: string) {
 
         // List of notes operations
         createNote,
+        createNoteWithLLM,
         deleteNote,
         refreshNotes
     }
