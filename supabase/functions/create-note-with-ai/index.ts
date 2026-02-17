@@ -37,12 +37,17 @@ Deno.serve(async (req) => {
       },
     });
 
+    // Get user session
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error("No user found")
+
     // LLM call
     const url =
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
     const prompt = `
   Based on the following transcription of a meeting titled "${title}", write a summary of the meeting. 
   Reply with just the summary and nothing else.
+  Be VERY CONCISE.
   ### TRANSCRIPTION
   ${content}
   `;
@@ -71,9 +76,6 @@ Deno.serve(async (req) => {
 
     console.log("LLM response:", summaryText);
 
-    // Get user session
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error("No user found")
     
     // Insert note
     const { data, error } = await supabase

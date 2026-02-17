@@ -2,7 +2,6 @@ import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { Note } from "@/types/models";
 import { useAuth } from "@/context/AuthContext";
-import { title } from "process";
 
 const FUNCTION_ENDPOINT = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-note-with-ai`;
 
@@ -142,7 +141,7 @@ export function useNoteManager(noteId?: string) {
             const noteData = await res.json();
             if (!noteData) throw new Error("No data returned from server");
 
-            console.log("LLM created:", noteData[0].title)
+            console.log("LLM created:", noteData)
             await refreshNotes()
 
         } catch (error: any) {
