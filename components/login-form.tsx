@@ -79,7 +79,7 @@ export function LoginForm({
                 />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit">Log In</Button>
                 <Button variant="outline" type="button" onSubmit={googleSignIn}>
                   Login with Google
                 </Button>

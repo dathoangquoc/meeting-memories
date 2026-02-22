@@ -1,3 +1,4 @@
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,12 +16,14 @@ import { Note } from "@/types/models";
 
 interface UpdateNoteDialogProps {
   noteData: Note;
+  onDelete: (noteId: string) => Promise<void>;
   onSubmit: (noteToSave?: Note) => Promise<void>;
 }
 
 export function UpdateNoteDialog({
   noteData,
   onSubmit,
+  onDelete,
 }: UpdateNoteDialogProps) {
   const [title, setTitle] = useState(noteData.title);
   const [content, setContent] = useState(noteData.content);
@@ -43,10 +46,7 @@ export function UpdateNoteDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-        >
+        <Button variant="outline" size="icon">
           <Pencil />
         </Button>
       </DialogTrigger>
@@ -77,9 +77,21 @@ export function UpdateNoteDialog({
               />
             </Field>
             {error && <div className="text-red-500 text-sm">{error}</div>}
-            <Button type="submit" disabled={isSubmitting}>
-              Submit
-            </Button>
+            {/* Buttons */}
+            <div className="flex justify-between">
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => {
+                  onDelete(noteData.note_id);
+                }}
+              >
+                <Trash2 />
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                Submit
+              </Button>
+            </div>
           </FieldGroup>
         </form>
       </DialogContent>

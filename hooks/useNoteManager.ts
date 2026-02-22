@@ -105,6 +105,7 @@ export function useNoteManager(noteId?: string) {
                 })
             if (error) throw error
             console.log(`Created note: ${title}`)
+            await refreshNotes()
         } catch (error: any) {
             console.error("Error creating note:", error)
             setError(error.message)

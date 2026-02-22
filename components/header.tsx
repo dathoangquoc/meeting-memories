@@ -62,7 +62,7 @@ export const HeroHeader = () => {
                                     variant="ghost"
                                     size="sm">
                                     <Link href="/login">
-                                        <span>Login</span>
+                                        <span>Log In</span>
                                     </Link>
                                 </Button>
                                 <Button
