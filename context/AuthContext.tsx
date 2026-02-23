@@ -12,7 +12,6 @@ import { createClient } from "@/lib/supabase/client";
 import { isAuthApiError, User } from "@supabase/supabase-js";
 import { Profile, Usage } from "@/types/models";
 
-
 interface AuthContextType {
   // States
   user: User | null;
@@ -44,8 +43,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // States
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [usage, setUsage] = useState<Usage | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [usage, setUsage] = useState<Usage | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -72,7 +71,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (!session?.user) {
+      if (session?.user) {
+        (async () => {
+          await getUsage();
+          await getProfile();
+          setIsLoading(false);
+        })();
+      } else {
         setUsage(null);
         setProfile(null);
       }
@@ -87,31 +92,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const getUsage = async () => {
-    try {      
+    try {
       const { data: usage, error } = await supabase
-      .from('usage_tracking')
-      .select()
-      .eq('year_month', new Date().toISOString().slice(0, 7))
-      .single()
-      if (error) throw error
-      setUsage(usage || null)
+        .from("usage_tracking")
+        .select()
+        .eq("year_month", new Date().toISOString().slice(0, 7))
+        .single();
+      if (error) throw error;
+      setUsage(usage || null);
     } catch (error: any) {
-      console.error("Error getting usage: ", error.message) 
+      console.error("Error getting usage: ", error.message);
     }
-  }
+  };
 
   const getProfile = async () => {
-    try {      
+    try {
       const { data: profile, error } = await supabase
-      .from('profiles')
-      .select()
-      .single()
-      if (error) throw error
-      setProfile(profile || null)
+        .from("profiles")
+        .select()
+        .single();
+      if (error) throw error;
+      setProfile(profile || null);
     } catch (error: any) {
-      console.error("Error getting usage: ", error.message) 
+      console.error("Error getting usage: ", error.message);
     }
-  }
+  };
 
   // Auth methods
   const signOut = async () => {
