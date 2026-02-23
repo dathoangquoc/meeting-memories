@@ -114,7 +114,7 @@ export function SignInForm({
             <AlertDialogHeader>
               <AlertDialogTitle>{error}</AlertDialogTitle>
               <AlertDialogDescription>
-                {error === "Invalid credentials" && "Double-check your email and password"}
+                Double-check your email and password
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

@@ -107,18 +107,12 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{error}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {error === "Invalid credentials"
-                ? "Double-check your email and password"
-                : "Try signing in!"}
-            </AlertDialogDescription>
+            <AlertDialogDescription>Try signing in!</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Close</AlertDialogCancel>
             <AlertDialogAction>
-              {error === "Account already existed" && (
-                <Link href="/login">Continue</Link>
-              )}
+              <Link href="/login">Continue</Link>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
