@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Spinner } from "./ui/8bit/spinner";
 
-const PUBLIC_ROUTES = ["/", "/signup", "/login"];
+const PUBLIC_ROUTES = ["/", "/signup", "/signin"];
 const DEFAULT_PUBLIC_ROUTE = "/";
 const DEFAULT_AUTHENTICATED_ROUTE = "/dashboard";
 

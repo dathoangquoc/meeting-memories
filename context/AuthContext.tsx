@@ -1,8 +1,15 @@
 "use client";
 
-import { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { createClient } from "@/lib/supabase/client";
-import { User } from "@supabase/supabase-js";
+import { isAuthApiError, User } from "@supabase/supabase-js";
 
 interface AuthContextType {
   // States
@@ -14,8 +21,9 @@ interface AuthContextType {
   error: string | null;
 
   // State operations
-  setEmail: Dispatch<SetStateAction<string>>
-  setPassword: Dispatch<SetStateAction<string>>
+  setEmail: Dispatch<SetStateAction<string>>;
+  setPassword: Dispatch<SetStateAction<string>>;
+  clearError: () => void;
 
   // Auth methods
   signOut: () => Promise<void>;
@@ -59,11 +67,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  const clearError = () => {
+    setError(null);
+  };
+
+  // Auth methods
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
-  // Auth methods
   const signIn = async () => {
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -72,8 +84,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       if (error) throw error;
     } catch (error: any) {
-      console.error("Error logging in:", error);
-      setError(error.message);
+      if (isAuthApiError(error)) {
+        if (error.code === "invalid_credentials") {
+          setError("Invalid credentials");
+        }
+      } else {
+        console.error("Error logging in:", error);
+        setError(error.message);
+      }
     }
   };
 
@@ -101,8 +119,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       if (error) throw error;
     } catch (error: any) {
-      console.error("Error signing up:", error);
-      setError(error.message);
+      if (isAuthApiError(error)) {
+        if (error.code === "user_already_exists") {
+          setError("Account already existed");
+        }
+      } else {
+        console.error("Error signing up:", error);
+        setError(error.message);
+      }
     }
   };
 
@@ -116,11 +140,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // State operations
     setEmail,
     setPassword,
+    clearError,
     // Auth methods
     signOut,
     signIn,
     googleSignIn,
-    signUp
+    signUp,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

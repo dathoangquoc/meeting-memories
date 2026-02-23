@@ -1,37 +1,43 @@
-'use client'
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import Link from "next/link"
-import { useAuth } from "@/context/AuthContext"
-import React from "react"
+} from "@/components/ui/field";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import React from "react";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
-  const {
-      email,
-      setEmail,
-      password,
-      setPassword,
-      signUp,
-    } = useAuth();
+  const { email, error, clearError, setEmail, password, setPassword, signUp } =
+    useAuth();
+  const isAlertOpen = !!error;
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    signUp()
-  }
+    signUp();
+  };
 
   return (
     <Card {...props}>
@@ -52,7 +58,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 placeholder="m@example.com"
                 required
                 value={email}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {setEmail(e.target.value)}} 
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setEmail(e.target.value);
+                }}
               />
               <FieldDescription>
                 We&apos;ll use this to contact you. We will not share your email
@@ -70,12 +78,14 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               <FieldLabel htmlFor="confirm-password">
                 Confirm Password
               </FieldLabel>
-              <Input 
-                id="confirm-password" 
-                type="password" 
-                required 
+              <Input
+                id="confirm-password"
+                type="password"
+                required
                 value={password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {setPassword(e.target.value)}}                 
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setPassword(e.target.value);
+                }}
               />
               <FieldDescription>Please confirm your password.</FieldDescription>
             </Field>
@@ -93,6 +103,26 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
           </FieldGroup>
         </form>
       </CardContent>
+      <AlertDialog open={isAlertOpen} onOpenChange={clearError}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{error}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {error === "Invalid credentials"
+                ? "Double-check your email and password"
+                : "Try signing in!"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Close</AlertDialogCancel>
+            <AlertDialogAction>
+              {error === "Account already existed" && (
+                <Link href="/login">Continue</Link>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
-  )
+  );
 }

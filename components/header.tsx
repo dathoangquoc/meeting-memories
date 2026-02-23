@@ -61,8 +61,8 @@ export const HeroHeader = () => {
                                     asChild
                                     variant="ghost"
                                     size="sm">
-                                    <Link href="/login">
-                                        <span>Log In</span>
+                                    <Link href="/signin">
+                                        <span>Sign In</span>
                                     </Link>
                                 </Button>
                                 <Button
@@ -138,7 +138,7 @@ const FloatingNavPill = ({ isScrolled }: { isScrolled: boolean }) => {
                                 asChild
                                 size="sm"
                                 className="mx-2 gap-1 pr-1">
-                                <Link href="/login">
+                                <Link href="/signin">
                                     <span>Get started</span>
                                     <ChevronRight className="opacity-50" />
                                 </Link>
