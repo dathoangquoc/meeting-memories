@@ -10,10 +10,14 @@ import {
 } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { isAuthApiError, User } from "@supabase/supabase-js";
+import { Profile, Usage } from "@/types/models";
+
 
 interface AuthContextType {
   // States
   user: User | null;
+  profile: Profile | null;
+  usage: Usage | null;
   email: string;
   password: string;
   isLoading: boolean;
@@ -24,6 +28,7 @@ interface AuthContextType {
   setEmail: Dispatch<SetStateAction<string>>;
   setPassword: Dispatch<SetStateAction<string>>;
   clearError: () => void;
+  getUsage: () => void;
 
   // Auth methods
   signOut: () => Promise<void>;
@@ -39,6 +44,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // States
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [usage, setUsage] = useState<Usage | null>(null)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -50,6 +57,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+      if (user) {
+        await getProfile();
+        await getUsage();
+      }
       setUser(user ?? null);
       setIsLoading(false);
     };
@@ -61,6 +72,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (!session?.user) {
+        setUsage(null);
+        setProfile(null);
+      }
       setIsLoading(false);
     });
 
@@ -70,6 +85,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const clearError = () => {
     setError(null);
   };
+
+  const getUsage = async () => {
+    try {      
+      const { data: usage, error } = await supabase
+      .from('usage_tracking')
+      .select()
+      .eq('year_month', new Date().toISOString().slice(0, 7))
+      .single()
+      if (error) throw error
+      setUsage(usage || null)
+    } catch (error: any) {
+      console.error("Error getting usage: ", error.message) 
+    }
+  }
+
+  const getProfile = async () => {
+    try {      
+      const { data: profile, error } = await supabase
+      .from('profiles')
+      .select()
+      .single()
+      if (error) throw error
+      setProfile(profile || null)
+    } catch (error: any) {
+      console.error("Error getting usage: ", error.message) 
+    }
+  }
 
   // Auth methods
   const signOut = async () => {
@@ -132,6 +174,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = {
     user,
+    profile,
+    usage,
     isLoading,
     isSignedIn: !!user,
     email,
@@ -141,6 +185,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setEmail,
     setPassword,
     clearError,
+    getUsage,
     // Auth methods
     signOut,
     signIn,
