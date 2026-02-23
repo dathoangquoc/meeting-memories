@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
     const { data, error } = await supabase
     .from('notes')
     .insert({
-      title: "Made by Gemini",
+      title: title,
       content: summaryText,
       user_id: user.id
     })
