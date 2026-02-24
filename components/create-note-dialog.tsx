@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Spinner } from "./ui/spinner";
 import {
   Dialog,
   DialogContent,
@@ -78,7 +79,13 @@ export function CreateNoteDialog({ onSubmit }: CreateNoteDialogProps) {
             </Field>
             {error && <div className="text-red-500 text-sm">{error}</div>}
             <Button type="submit" disabled={isSubmitting}>
-              Create
+              {isSubmitting ? (
+                <span className="flex items-center gap-2">
+                  <Spinner /> LLM processing...
+                </span>
+              ) : (
+                "Submit"
+              )}
             </Button>
           </FieldGroup>
         </form>
