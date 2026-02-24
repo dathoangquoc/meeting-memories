@@ -30,7 +30,7 @@ import { useAuth } from "@/context/AuthContext";
 import React from "react";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
-  const { email, error, clearError, setEmail, password, setPassword, signUp } =
+  const { email, error, clearError, setEmail, password, setPassword, signUp, googleSignIn } =
     useAuth();
   const isAlertOpen = !!error;
 
@@ -92,7 +92,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
             <FieldGroup>
               <Field>
                 <Button type="submit">Create Account</Button>
-                <Button variant="outline" type="button">
+                <Button variant="outline" type="button" onClick={googleSignIn}>
                   Sign up with Google
                 </Button>
                 <FieldDescription className="px-6 text-center">

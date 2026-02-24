@@ -97,7 +97,7 @@ export function SignInForm({
               </Field>
               <Field>
                 <Button type="submit">Sign In</Button>
-                <Button variant="outline" type="button" onSubmit={googleSignIn}>
+                <Button variant="outline" type="button" onClick={googleSignIn}>
                   Sign in with Google
                 </Button>
                 <FieldDescription className="text-center">
